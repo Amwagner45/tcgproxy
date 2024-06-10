@@ -43,7 +43,7 @@ def get_card_json(json_url):
         print("card.json already exists.")
 
 
-def update_card_json():
+def update_card_json(json_url):
     # Check if the file exists
     if os.path.isfile("card.json"):
         os.remove("card.json")
