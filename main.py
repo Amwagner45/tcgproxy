@@ -53,31 +53,65 @@ def update_card_json():
     download_card_json(json_url)
 
 
-def testing():
-    with open("card.json", "r", encoding="utf-8") as f:
-        card_data = json.load(f)
+def parse_decklist():
+    ## need to parse the given decklist and download each image
+    decklist_json = {"Hero": "", "Weapons": [], "Equipment": [], "Deck": []}
+    with open("example_decklist.txt", "r", encoding="UTF-8") as file:
+        for line in file:
+            line_stripped = line.strip()
+            # print(line_stripped)
+            if line_stripped.startswith("Hero"):
+                decklist_json["Hero"] = line_stripped.split("Hero: ")[1]
+            if line_stripped.startswith("Weapons"):
+                decklist_json["Weapons"] = line_stripped.split("Weapons: ")[1].split(
+                    ","
+                )
+            if line_stripped.startswith("Equipment"):
+                decklist_json["Equipment"] = line_stripped.split("Equipment: ")[
+                    1
+                ].split(",")
+            if line_stripped.startswith("("):
+                deck_card_name = line_stripped.split(") ")[1].split(" (")[0]
+                deck_card_pitch_name = (
+                    line_stripped.split(") ")[1].split(" (")[1].split(")")[0]
+                )
+                if deck_card_pitch_name == "red":
+                    deck_card_pitch = "1"
+                elif deck_card_pitch_name == "yellow":
+                    deck_card_pitch = "2"
+                elif deck_card_pitch_name == "blue":
+                    deck_card_pitch = "3"
+                else:
+                    deck_card_pitch = "error"
 
-    df = pd.json_normalize(card_data)
-
-    print(df.head())
-
-
-def testing1():
-    with open("card.json", "r", encoding="utf-8") as f:
-        card_data = json.load(f)
-
-    card_list = []
-    for card in card_data:
-        card_data = {"name": "", "pitch": "", "images": []}
-        card_data["name"] = card["name"]
-        card_data["pitch"] = card["pitch"]
-        for printing in card["printings"]:
-            card_data["images"].append(printing["image_url"])
-
-        card_list.append(card_data)
-        break
-
-    print(card_list)
+                decklist_json["Deck"].append(f"{deck_card_name} - {deck_card_pitch}")
+    return decklist_json
 
 
-download_card_json(json_url)
+with open("card.json", "r", encoding="UTF-8") as f:
+    carddb = json.load(f)
+
+
+def search_card(card_name: str, pitch_value: str = "Null"):
+    if pitch_value == "Null":
+        result = [card for card in carddb if card["name"] == card_name]
+    else:
+        result = [
+            card
+            for card in carddb
+            if card["name"] == card_name and card["pitch"] == pitch_value
+        ]
+    return result[0]
+
+
+if __name__ == "__main__":
+    # download_card_json(json_url)
+    decklist = parse_decklist()
+    result = search_card(decklist["Hero"])
+    print(result["images"])
+    # print(decklist)
+    pass
+
+## create folder structure for downloaded images
+## in hero subfolder, check if image already exists, then add hero cards
+## do the same for all sections
