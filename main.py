@@ -88,8 +88,30 @@ def parse_decklist():
     return decklist_json
 
 
+with open("card.json", "r", encoding="UTF-8") as f:
+    carddb = json.load(f)
+
+
+def search_card(card_name: str, pitch_value: str = "Null"):
+    if pitch_value == "Null":
+        result = [card for card in carddb if card["name"] == card_name]
+    else:
+        result = [
+            card
+            for card in carddb
+            if card["name"] == card_name and card["pitch"] == pitch_value
+        ]
+    return result[0]
+
+
 if __name__ == "__main__":
     # download_card_json(json_url)
     decklist = parse_decklist()
-    print(decklist)
+    result = search_card(decklist["Hero"])
+    print(result["images"])
+    # print(decklist)
     pass
+
+## create folder structure for downloaded images
+## in hero subfolder, check if image already exists, then add hero cards
+## do the same for all sections
