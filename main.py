@@ -3,8 +3,6 @@ import pandas as pd
 import os
 import json
 
-json_url = "https://raw.githubusercontent.com/the-fab-cube/flesh-and-blood-cards/develop/json/english/card.json"
-
 
 def filter_card_json(card_data):
     card_list = []
@@ -36,7 +34,7 @@ def download_card_json(json_url):
         print(f"Download failed! Status code: {response.status_code}")
 
 
-def get_card_json():
+def get_card_json(json_url):
     # Check if the file exists
     if not os.path.isfile("card.json"):
         print("card.json not found. Downloading...")
@@ -88,11 +86,10 @@ def parse_decklist():
     return decklist_json
 
 
-with open("card.json", "r", encoding="UTF-8") as f:
-    carddb = json.load(f)
-
-
 def search_card(card_name: str, pitch_value: str = "Null"):
+    with open("card.json", "r", encoding="UTF-8") as f:
+        carddb = json.load(f)
+
     if pitch_value == "Null":
         result = [card for card in carddb if card["name"] == card_name]
     else:
@@ -104,13 +101,16 @@ def search_card(card_name: str, pitch_value: str = "Null"):
     return result[0]
 
 
-if __name__ == "__main__":
-    # download_card_json(json_url)
+def main():
+    json_url = "https://raw.githubusercontent.com/the-fab-cube/flesh-and-blood-cards/develop/json/english/card.json"
+    get_card_json(json_url)
     decklist = parse_decklist()
     result = search_card(decklist["Hero"])
     print(result["images"])
-    # print(decklist)
-    pass
+
+
+if __name__ == "__main__":
+    main()
 
 ## create folder structure for downloaded images
 ## in hero subfolder, check if image already exists, then add hero cards
